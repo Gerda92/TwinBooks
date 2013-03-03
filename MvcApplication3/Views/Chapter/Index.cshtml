@@ -1,0 +1,44 @@
+﻿@model IEnumerable<EasyReading.Models.Chapter>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Order)
+        </th>
+        <th>Book</th>
+        <th>Parent</th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Order)
+        </td>
+        <td>
+            @item.InBook.Title
+        </td>
+        <td>
+            @{
+                var p = item.Parent == null ? "null" : item.Parent.ChapterId;
+            }
+            @p
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ChapterId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ChapterId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ChapterId })
+        </td>
+    </tr>
+}
+
+</table>

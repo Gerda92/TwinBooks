@@ -1,0 +1,11 @@
+﻿@model IEnumerable<EasyReading.Models.BookGroup>
+
+@Html.ActionLink("Create a new twin book!", "Create", "Book")
+
+<ul>
+    @foreach (var item in Model)
+    {
+        <li>@Html.ActionLink(item.Title, "AlignChapters", "Alignment", new { id1 = item.Books.ElementAt(0).Id, id2 = item.Books.ElementAt(1).Id }, new { })
+            by @item.Author</li>
+    }
+</ul>

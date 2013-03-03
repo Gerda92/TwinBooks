@@ -1,0 +1,23 @@
+﻿
+@{
+    var body1 = EasyReading.Lib.BookFormatter.GetHtmlBody(Model[0].Path);
+    var body2 = EasyReading.Lib.BookFormatter.GetHtmlBody(Model[1].Path);
+}
+
+<h2>TwoBooks</h2>
+
+@Html.ActionLink("Done!", "AlignSentences", new { id1 = Model[0].Id, id2 = Model[1].Id })
+
+<table><tr>
+
+    <td style="vertical-align:top;" class="left-twin">
+        @Html.Raw(body1)
+    </td>
+
+    <td style="vertical-align:top;" class="right-twin">
+        @Html.Raw(body2)
+    </td>
+
+</tr></table>
+
+@Scripts.Render("~/Scripts/alignment.js")
