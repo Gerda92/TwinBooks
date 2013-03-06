@@ -46,7 +46,8 @@ namespace EasyReading.Lib
 
             StripTrash(doc);
 
-            BreakIntoSentences(doc.DocumentNode, book.Id + "-" + book.Language + "-");
+            List<Bookmark> bms = BreakIntoSentences(doc.DocumentNode, book.Id + "-" + book.Language + "-");
+            book.Bookmarks = bms;
 
             List<Chapter> toc = extractTOC(doc.DocumentNode, doc.DocumentNode.SelectSingleNode("//ul"), book);
             book.Chapters = toc;
@@ -187,8 +188,10 @@ namespace EasyReading.Lib
         }
 
 
-        private static void BreakIntoSentences(HtmlNode root, string sentenceIdPrefix)
+        private static List<Bookmark> BreakIntoSentences(HtmlNode root, string sentenceIdPrefix)
         {
+            List<Bookmark> sentences = new List<Bookmark>();
+
             // selects all p and div that may contain text (or may not...)
             var nodes = root.SelectNodes("//body//*[text()[normalize-space()]]");
 
@@ -215,8 +218,12 @@ namespace EasyReading.Lib
                     {
                         if (Regex.Replace(chunk, "[ \f\n\r\t\v]", "").Length > 0)
                         {
-                            newp += "<span class=\"sentence\" id=" + sentenceIdPrefix +
-                                "-" + counter + ">" + chunk + " </span>";
+                            string id = sentenceIdPrefix + "-" + counter;
+
+                            newp += "<span class=\"sentence\" id=" + id + ">" + chunk + " </span>";
+
+                            sentences.Add(new Bookmark() { BookmarkId = id, Order = counter });
+
                             counter++;
                         }
                     }
@@ -232,6 +239,8 @@ namespace EasyReading.Lib
                     //ptag.Remove();
                 }
             }
+
+            return sentences;
         }
 
         private static string ExtractChapters(Book book, List<Chapter> chapters)

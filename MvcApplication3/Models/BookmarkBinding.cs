@@ -10,12 +10,9 @@ namespace EasyReading.Models
     {
         [Key]
         public int Id { get; set; }
-        public int BookId1 { get; set; }
-        public int BookId2 { get; set; }
-        public string BookmarkId1 { get; set; }
-        public string BookmarkId2 { get; set; }
-        public int Order1 { get; set; }
-        public int Order2 { get; set; }
+        public virtual Bookmark Bookmark1 { get; set; }
+        public virtual Bookmark Bookmark2 { get; set; }
+        public int Type { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public BookmarkBinding () 

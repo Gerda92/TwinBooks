@@ -23,6 +23,7 @@ namespace EasyReading.Models
         public string Path { get; set; }
 
         public virtual ICollection<Chapter> Chapters { get; set; }
+        public virtual ICollection<Bookmark> Bookmarks { get; set; }
 
         // The same book in different languages or variants is one group
         public BookGroup Group { get; set; }
@@ -30,6 +31,7 @@ namespace EasyReading.Models
         public Book()
         {
             Chapters = new List<Chapter>();
+            Bookmarks = new List<Bookmark>();
         }
 
     }

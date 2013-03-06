@@ -64,31 +64,56 @@ namespace EasyReading.Controllers
         [HttpGet]
         public JsonResult CreateBookmarkBinding(int book1, int book2, string id1, string id2 = null)
         {
-
+            Bookmark bm1 = db.Bookmarks.Single(r => (r.InBook.Id == book1) && (r.BookmarkId == id1));
+            Bookmark bm2 = db.Bookmarks.Single(r => (r.InBook.Id == book2) && (r.BookmarkId == id2));
             BookmarkBinding mark = new BookmarkBinding()
             {
-                BookId1 = book1,
-                BookId2 = book2,
-                BookmarkId1 = id1,
-                BookmarkId2 = id2,
-                Order1 = BookFormatter.getOrder(id1),
-                Order2 = BookFormatter.getOrder(id2)
+                Bookmark1 = bm1,
+                Bookmark2 = bm2
             };
 
             db.BookmarkBindings.Add(mark);
             db.SaveChanges();
 
-            return Json(mark, JsonRequestBehavior.AllowGet);
+            return Json("Success!", JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
         public JsonResult GetBookmarkBinding(int book1, int book2)
         {
 
-            var marks = db.getBookmarkBindings(book1, book2);
+            var marks = db.getBookmarks(book1, book2).Select(
+                    b => new
+                    {
+                        Id = b.Id,
+                        BookId1 = b.Bookmark1.InBook.Id,
+                        BookId2 = b.Bookmark2.InBook.Id,
+                        BookmarkId1 = b.Bookmark1.BookmarkId,
+                        BookmarkId2 = b.Bookmark2.BookmarkId
+                    }
+                );
+
 
             return Json(marks, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult GetRawBookmarkBinding(int book1, int book2)
+        {
+
+            var marks = db.getBookmarkBindings(book1, book2).Select(
+                    b => new
+                    {
+                        Id = b.Id,
+                        BookId1 = b.Bookmark1.InBook.Id,
+                        BookId2 = b.Bookmark2.InBook.Id,
+                        BookmarkId1 = b.Bookmark1.BookmarkId,
+                        BookmarkId2 = b.Bookmark2.BookmarkId
+                    }
+                );
+
+
+            return Json(marks, JsonRequestBehavior.AllowGet);
+        }
     }
 }

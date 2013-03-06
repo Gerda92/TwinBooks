@@ -193,6 +193,7 @@
     <Compile Include="Models\Book.cs" />
     <Compile Include="Models\BookDbContext.cs" />
     <Compile Include="Models\BookGroup.cs" />
+    <Compile Include="Models\Bookmark.cs" />
     <Compile Include="Models\BookmarkBinding.cs" />
     <Compile Include="Models\Chapter.cs" />
     <Compile Include="Models\ChapterBinding.cs" />

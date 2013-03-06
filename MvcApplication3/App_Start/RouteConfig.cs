@@ -50,6 +50,12 @@ namespace EasyReading
             );
 
             routes.MapRoute(
+                name: "GetRawBookmarks",
+                url: "GetRawBookmarks/{book1}/{book2}",
+                defaults: new { controller = "Alignment", action = "GetRawBookmarkBinding" }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
