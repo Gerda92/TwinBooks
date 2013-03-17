@@ -188,6 +188,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Lib\BookAligner.cs" />
     <Compile Include="Lib\BookFormatter.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Book.cs" />

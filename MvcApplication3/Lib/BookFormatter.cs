@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using MoreLinq;
+using MvcApplication3.Lib;
 
 namespace EasyReading.Lib
 {
@@ -56,16 +58,19 @@ namespace EasyReading.Lib
 
         }
 
-        public static string CreateTweenBook(Book book1, Book book2, List<Chapter> chapters1, List<Chapter> chapters2)
+        public static string CreateTweenBook(Book book1, Book book2, List<ChapterBinding> chapters)
         {
             string path = "~/App_Data/TwinBooks/" + book1.Id + "-" + book2.Id + ".html";
-            if (System.IO.File.Exists(System.Web.Hosting.HostingEnvironment.MapPath(path))) return path;
+            //if (System.IO.File.Exists(System.Web.Hosting.HostingEnvironment.MapPath(path))) return path;
             HtmlDocument doc = new HtmlDocument();
             doc.Load(System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/TwinBooks/twin_template.html"));
             var left = doc.DocumentNode.SelectSingleNode("//body//*[@class='left-twin']");
+            var chapters1 = getBindedChapters(chapters, book1, book2);
             left.InnerHtml = (ExtractChapters(book1, chapters1));
             var right = doc.DocumentNode.SelectSingleNode("//body//*[@class='right-twin']");
+            var chapters2 = getBindedChapters(chapters, book2, book1);
             right.InnerHtml = (ExtractChapters(book2, chapters2));
+
             doc.Save(System.Web.Hosting.HostingEnvironment.MapPath(path));
             return path;
         }
@@ -84,6 +89,27 @@ namespace EasyReading.Lib
         #endregion get book
 
         #region private methods
+
+        private static List<Chapter> getBindedChapters(List<ChapterBinding> bindings, Book first, Book second)
+        {
+            var chapters = (bindings.ElementAt(0).ChapterOne.InBook.Id == first.Id) ?
+                bindings.Select(ch => new Chapter
+                {
+                    Id = ch.ChapterOne.Id,
+                    ChapterId = ch.ChapterOne.ChapterId,
+                    InBook = ch.ChapterOne.InBook,
+                    Order = ch.ChapterOne.Order
+                }) :
+                bindings.Select(ch => new Chapter
+                {
+                    Id = ch.ChapterTwo.Id,
+                    ChapterId = ch.ChapterTwo.ChapterId,
+                    InBook = ch.ChapterTwo.InBook,
+                    Order = ch.ChapterTwo.Order
+                });
+            chapters.OrderBy(ch => ch.Order).DistinctBy(ch => ch.Id);
+            return chapters.ToList();
+        }
 
         private static List<Chapter> extractTOC(HtmlNode root, HtmlNode toc, Book book, Chapter parent = null)
         {
@@ -251,12 +277,24 @@ namespace EasyReading.Lib
             string html = "";
             foreach (Chapter chapter in chapters)
             {
+                
+                HtmlNode a = getById(doc.DocumentNode, chapter.ChapterId);
+                HtmlNodeCollection ps = getFollowingChapter(doc.DocumentNode, chapter.ChapterId);
+                
+                HtmlNode ch = HtmlNode.CreateNode("<div class='chapter_div'></div>");
+                ch.AppendChild(a);
+                ch.AppendChildren(ps);
+                html += ch.OuterHtml;
+                 
+                /*
                 html += getById(doc.DocumentNode, chapter.ChapterId).OuterHtml;
                 foreach (HtmlNode node in getFollowingChapter(doc.DocumentNode, chapter.ChapterId))
                 {
                     html += node.OuterHtml;
                 }
+                */
             }
+
             return html;
         }
 

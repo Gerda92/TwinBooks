@@ -1,5 +1,6 @@
 ﻿using EasyReading.Lib;
 using EasyReading.Models;
+using MvcApplication3.Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,10 +49,21 @@ namespace EasyReading.Controllers
             var book1 = db.Books.Find(id1);
             var book2 = db.Books.Find(id2);
 
-            var chapters1 = db.getBindedChapters(book1, book2);
-            var chapters2 = db.getBindedChapters(book2, book1);
+            var chapters = db.getChapterBindings(book1, book2);
+            //var chapters1 = db.getBindedChapters(book1, book2);
+            //var chapters2 = db.getBindedChapters(book2, book1);
 
-            var twin = BookFormatter.CreateTweenBook(book1, book2, chapters1, chapters2);
+            var twin = BookFormatter.CreateTweenBook(book1, book2, chapters);
+
+            var bms = BookAligner.AlignByChapters(book1, book2, twin);
+
+            foreach (var bm in bms)
+            {
+                db.BookmarkBindings.Add(bm);
+            }
+
+            db.SaveChanges();
+
             var html = BookFormatter.GetHtmlBody(twin);
 
 

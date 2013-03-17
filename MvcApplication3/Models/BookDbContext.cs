@@ -16,20 +16,6 @@ namespace EasyReading.Models
         public DbSet<BookmarkBinding> BookmarkBindings { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
 
-
-        public List<Chapter> getBindedChapters(Book first, Book second)
-        {
-            var bindings = getChapterBindings(first, second);
-            var chapters = bindings.Select(ch => new Chapter
-            {
-                Id = ch.ChapterOne.Id,
-                ChapterId = ch.ChapterOne.ChapterId,
-                InBook = ch.ChapterOne.InBook,
-                Order = ch.ChapterOne.Order
-            }).OrderBy(ch => ch.Order).DistinctBy(ch => ch.Id);
-            return chapters.ToList();
-        }
-
         public List<ChapterBinding> getChapterBindings(Book first, Book second)
         {
             var binding1 = ChapterBindings.Where(r => (r.ChapterOne.InBook.Id == first.Id
