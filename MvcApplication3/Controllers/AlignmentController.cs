@@ -81,10 +81,24 @@ namespace EasyReading.Controllers
             BookmarkBinding mark = new BookmarkBinding()
             {
                 Bookmark1 = bm1,
-                Bookmark2 = bm2
+                Bookmark2 = bm2,
+                Type = 1
             };
 
+            var marks = db.getBookmarks(book1, book2);
+
+            var upper = marks.LastOrDefault(b => b.Bookmark1.Order < mark.Bookmark1.Order && b.Type == 1);
+            if (upper == null) upper = marks.First();
+            var lower = marks.FirstOrDefault(b => b.Bookmark1.Order > mark.Bookmark1.Order && b.Type == 1);
+            if (lower == null) lower = marks.Last();
+            var realign = BookAligner.AlignInRange(upper, mark);
+            realign.AddRange(BookAligner.AlignInRange(mark, lower));
             db.BookmarkBindings.Add(mark);
+            
+            foreach (var b in realign) {
+                db.BookmarkBindings.Add(b);
+            }
+             
             db.SaveChanges();
 
             return Json("Success!", JsonRequestBehavior.AllowGet);
@@ -101,7 +115,8 @@ namespace EasyReading.Controllers
                         BookId1 = b.Bookmark1.InBook.Id,
                         BookId2 = b.Bookmark2.InBook.Id,
                         BookmarkId1 = b.Bookmark1.BookmarkId,
-                        BookmarkId2 = b.Bookmark2.BookmarkId
+                        BookmarkId2 = b.Bookmark2.BookmarkId,
+                        Type = b.Type
                     }
                 );
 

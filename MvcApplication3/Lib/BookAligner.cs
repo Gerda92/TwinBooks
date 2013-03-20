@@ -31,7 +31,8 @@ namespace MvcApplication3.Lib
                     BookmarkBinding bm = new BookmarkBinding()
                     {
                         Bookmark1 = bm1,
-                        Bookmark2 = bm2
+                        Bookmark2 = bm2,
+                        Type = 0
                     };
                     bindings.Add(bm);
 
@@ -45,8 +46,29 @@ namespace MvcApplication3.Lib
         }
         public static List<BookmarkBinding> AlignInRange(BookmarkBinding bm1, BookmarkBinding bm2)
         {
-            //var left = getSentencesBetween()
             var bindings = new List<BookmarkBinding>();
+
+            List<Bookmark> marks1 = bm1.Bookmark1.InBook.Bookmarks
+                .Where(b => b.Order > bm1.Bookmark1.Order & b.Order < bm2.Bookmark1.Order).OrderBy(b => b.Order).ToList();
+
+            List<Bookmark> marks2 = bm1.Bookmark2.InBook.Bookmarks
+                .Where(b => b.Order > bm1.Bookmark2.Order & b.Order < bm2.Bookmark2.Order).OrderBy(b => b.Order).ToList();
+
+            int count = 0;
+            foreach (var b1 in marks1)
+            {
+                if (count >= marks1.Count || count >= marks2.Count) break;
+                var b2 = marks2.ElementAt(count);
+                BookmarkBinding bm = new BookmarkBinding()
+                {
+                    Bookmark1 = b1,
+                    Bookmark2 = b2,
+                    Type = 0
+                };
+                bindings.Add(bm);
+                count++;
+            }
+
             return bindings;
         }
 

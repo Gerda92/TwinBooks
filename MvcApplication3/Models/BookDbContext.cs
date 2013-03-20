@@ -46,16 +46,17 @@ namespace EasyReading.Models
         {
             var bm1 = Bookmarks.Where(r => r.InBook.Id == book1).OrderBy(r => r.Order);
             var bm2 = Bookmarks.Where(r => r.InBook.Id == book2).OrderBy(r => r.Order);
-            var bindings = getBookmarkBindings(book1, book2).OrderByDescending(r => r.CreatedAt).ToList();
+            var bindings = getBookmarkBindings(book1, book2).OrderByDescending(r => r.Type)
+                .ThenByDescending(r => r.CreatedAt).ToList();
             for (int i = 0; i < bindings.Count; i++ )
             {
                 var b = bindings.ElementAt(i);
                 var affected = bindings.Where(r => ((r.Bookmark1.Order - b.Bookmark1.Order) * (r.Bookmark2.Order - b.Bookmark2.Order) <= 0)
-                    && r.CreatedAt < b.CreatedAt);
+                    && (r.CreatedAt < b.CreatedAt || r.Type < b.Type));
                 bindings.RemoveAll(r => ((r.Bookmark1.Order - b.Bookmark1.Order) * (r.Bookmark2.Order - b.Bookmark2.Order) <= 0)
-                    && r.CreatedAt < b.CreatedAt);
+                    && (r.CreatedAt < b.CreatedAt || r.Type < b.Type));
             }
-            return bindings;
+            return bindings.OrderBy(r => r.Bookmark1.Order);
         }
         
         public IQueryable<BookmarkBinding> getBookmarkBindings(int book1, int book2)
