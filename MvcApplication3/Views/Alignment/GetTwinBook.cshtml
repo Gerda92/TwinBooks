@@ -1,0 +1,45 @@
+﻿@model EasyReading.Models.TwinBook
+
+@{
+    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+    doc.Load(System.Web.Hosting.HostingEnvironment.MapPath(Model.Path));
+    var marks = Model.Bookmarks.Where(b => b.Active == true).OrderBy(r => r.Bookmark1.Order).ToList();
+    var bm1 = Model.Book1.Bookmarks;
+    var bm2 = Model.Book2.Bookmarks;
+}
+
+<table class="table">
+@{ /*
+    @for (int i = 0; i < marks.Count - 1; i++) {
+    <tr id="mark-@marks.ElementAt(i).Id">
+        <td class="left-twin">
+            @{
+                var cell = bm1.Where(b => b.Order >= marks.ElementAt(i).Bookmark1.Order
+                    && b.Order < marks.ElementAt(i+1).Bookmark1.Order).OrderBy(b => b.Order);
+            }
+            @foreach (var c in cell) {
+                @Html.Raw(doc.GetElementbyId(c.BookmarkId).OuterHtml)
+            }
+        </td>
+        <td class="right-twin">
+            @{
+                cell = bm2.Where(b => b.Order >= marks.ElementAt(i).Bookmark2.Order
+                    && b.Order < marks.ElementAt(i + 1).Bookmark2.Order).OrderBy(b => b.Order);
+            }
+            @foreach (var c in cell) {
+                @Html.Raw(doc.GetElementbyId(c.BookmarkId).OuterHtml)
+            }
+
+        </td>
+    </tr>
+    }
+    
+*/ }
+</table>
+<div id="rawtext" style="display:none;">
+    @Html.Raw(EasyReading.Lib.BookFormatter.GetHtmlBody(Model.Path))
+</div>
+<div class="alignments" style="display:none;">
+    @ViewBag.Alignments
+</div>
+@Scripts.Render("~/Scripts/bm_alignment.js")

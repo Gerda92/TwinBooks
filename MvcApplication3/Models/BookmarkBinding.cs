@@ -13,10 +13,12 @@ namespace EasyReading.Models
         public virtual Bookmark Bookmark1 { get; set; }
         public virtual Bookmark Bookmark2 { get; set; }
         public int Type { get; set; }
+        public bool Active { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public BookmarkBinding () 
         {
+            Active = true;
             CreatedAt = DateTime.Now;
         }
     }

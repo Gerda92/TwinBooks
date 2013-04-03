@@ -14,7 +14,7 @@ namespace EasyReading.Controllers
 
         public ActionResult Index()
         {
-            return View(db.BookGroups.ToList());
+            return View(db.TwinBooks.ToList());
         }
 
         public ActionResult About()

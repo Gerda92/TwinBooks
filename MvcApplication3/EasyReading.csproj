@@ -198,6 +198,7 @@
     <Compile Include="Models\BookmarkBinding.cs" />
     <Compile Include="Models\Chapter.cs" />
     <Compile Include="Models\ChapterBinding.cs" />
+    <Compile Include="Models\TwinBook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -262,7 +263,8 @@
     <None Include="Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="bin\eBdb.EpubReader.dll" />
     <Content Include="bin\Ionic.Zip.dll" />
-    <Content Include="Scripts\alignment.js" />
+    <Content Include="Scripts\bm_alignment.js" />
+    <Content Include="Scripts\ch_alignment.js" />
     <Content Include="Scripts\jquery-1.7.1.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -329,7 +331,8 @@
     <Content Include="Views\Chapter\Create.cshtml" />
     <Content Include="Views\Chapter\Edit.cshtml" />
     <Content Include="Views\Chapter\Delete.cshtml" />
-    <Content Include="Views\Alignment\AlignSentences.cshtml" />
+    <Content Include="Views\Alignment\GetTwinBook.cshtml" />
+    <Content Include="Views\Alignment\Binding.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\HtmlBooks\" />

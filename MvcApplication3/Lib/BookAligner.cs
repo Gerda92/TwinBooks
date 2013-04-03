@@ -9,8 +9,11 @@ namespace MvcApplication3.Lib
 {
     public class BookAligner
     {
-        public static List<BookmarkBinding> AlignByChapters(Book book1, Book book2, string path)
+        public static List<BookmarkBinding> AlignByChapters(TwinBook tb)
         {
+            Book book1 = tb.Book1;
+            Book book2 = tb.Book2;
+            string path = tb.Path;
             HtmlDocument doc = new HtmlDocument();
             doc.Load(System.Web.Hosting.HostingEnvironment.MapPath(path));
             var left = doc.DocumentNode.SelectSingleNode("//body//*[@class='left-twin']");

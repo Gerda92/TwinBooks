@@ -58,8 +58,11 @@ namespace EasyReading.Lib
 
         }
 
-        public static string CreateTweenBook(Book book1, Book book2, List<ChapterBinding> chapters)
+        public static string CreateTweenBook(TwinBook tb)
         {
+            Book book1 = tb.Book1;
+            Book book2 = tb.Book2;
+            List<ChapterBinding> chapters = tb.Chapters.ToList();
             string path = "~/App_Data/TwinBooks/" + book1.Id + "-" + book2.Id + ".html";
             //if (System.IO.File.Exists(System.Web.Hosting.HostingEnvironment.MapPath(path))) return path;
             HtmlDocument doc = new HtmlDocument();
@@ -239,7 +242,9 @@ namespace EasyReading.Lib
 
                     // long-suffering regex matching sentences (with <br/>!)
                     // Regex sentenceMatch = new Regex("[^ \f\n\r\t\v]([^.!?<>])+([.!?]\"|[.!?]|[<]br[/]*[>])");
-                    Regex sentenceMatch = new Regex("([^ \f\n\r\t\v][^.!?]*[.!?]+[\" ]*)");
+                    // Regex sentenceMatch = new Regex("([^ \f\n\r\t\v][^.!?]*[.!?]+[\" ]*)");
+                    // with stupid ” and hard trailing whitespace
+                    Regex sentenceMatch = new Regex("([^ \f\n\r\t\v][^.!?]*[.!?]+[\"” ]*)");
                     foreach (string chunk in sentenceMatch.Split(text))
                     {
                         if (Regex.Replace(chunk, "[ \f\n\r\t\v]", "").Length > 0)

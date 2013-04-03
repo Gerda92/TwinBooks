@@ -27,8 +27,14 @@ namespace EasyReading
 
             routes.MapRoute(
                 name: "FurtherAlignment",
-                url: "AlignSentences/{id1}/{id2}",
-                defaults: new { controller = "Alignment", action = "AlignSentences" }
+                url: "Alignment/CreateTwin/{id}",
+                defaults: new { controller = "Alignment", action = "CreateTwinBook" }
+            );
+
+            routes.MapRoute(
+                name: "GetTwin",
+                url: "Alignment/Twin/{id}",
+                defaults: new { controller = "Alignment", action = "GetTwinBook" }
             );
 
             routes.MapRoute(
@@ -39,20 +45,8 @@ namespace EasyReading
 
             routes.MapRoute(
                 name: "SentenceBinding",
-                url: "Alignment/CreateBookmark/{book1}/{book2}/{id1}/{id2}",
+                url: "Alignment/CreateBookmark/{twinId}/{id1}/{id2}",
                 defaults: new { controller = "Alignment", action = "CreateBookmarkBinding" }
-            );
-
-            routes.MapRoute(
-                name: "GetBookmarks",
-                url: "GetBookmarks/{book1}/{book2}",
-                defaults: new { controller = "Alignment", action = "GetBookmarkBinding" }
-            );
-
-            routes.MapRoute(
-                name: "GetRawBookmarks",
-                url: "GetRawBookmarks/{book1}/{book2}",
-                defaults: new { controller = "Alignment", action = "GetRawBookmarkBinding" }
             );
 
             routes.MapRoute(

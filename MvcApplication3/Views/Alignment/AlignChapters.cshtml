@@ -1,12 +1,13 @@
-﻿
+﻿@model EasyReading.Models.TwinBook
+
 @{
-    var body1 = EasyReading.Lib.BookFormatter.GetHtmlBody(Model[0].Path);
-    var body2 = EasyReading.Lib.BookFormatter.GetHtmlBody(Model[1].Path);
+    var body1 = EasyReading.Lib.BookFormatter.GetHtmlBody(Model.Book1.Path);
+    var body2 = EasyReading.Lib.BookFormatter.GetHtmlBody(Model.Book2.Path);
 }
 
 <h2>TwoBooks</h2>
 
-@Html.ActionLink("Done!", "AlignSentences", new { id1 = Model[0].Id, id2 = Model[1].Id })
+@Html.ActionLink("Done!", "CreateTwin", new { id = Model.Id })
 
 <table><tr>
 
@@ -20,4 +21,4 @@
 
 </tr></table>
 
-@Scripts.Render("~/Scripts/alignment.js")
+@Scripts.Render("~/Scripts/ch_alignment.js")

@@ -4,6 +4,7 @@ using MvcApplication3.Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -19,7 +20,27 @@ namespace EasyReading.Controllers
         {
             var book1 = db.Books.Find(id1);
             var book2 = db.Books.Find(id2);
-            return View(new Object[] {book1, book2});
+            TwinBook tb = new TwinBook()
+                {
+                    Book1 = book1,
+                    Book2 = book2
+                };
+            try
+            {
+                tb = db.TwinBooks.Single(t => t.Book1.Id == id1 && t.Book2.Id == id2);
+            }
+            catch (Exception e)
+            {
+                tb = new TwinBook()
+                {
+                    Book1 = book1,
+                    Book2 = book2
+                };
+                db.TwinBooks.Add(tb);
+                db.SaveChanges();
+            }
+
+            return View(tb);
         }
 
         //
@@ -28,8 +49,11 @@ namespace EasyReading.Controllers
         [HttpGet]
         public JsonResult CreateChapterBinding(string id1, string id2 = null)
         {
+
             var ch1 = db.Chapters.Single(r => r.ChapterId == id1);
             var ch2 = id2 == null ? null : db.Chapters.Single(r => r.ChapterId == id2);
+
+            var tb = db.TwinBooks.Single(t => t.Book1.Id == ch1.InBook.Id && t.Book2.Id == ch2.InBook.Id);
 
             ChapterBinding cb = new ChapterBinding()
             {
@@ -37,78 +61,129 @@ namespace EasyReading.Controllers
                 ChapterTwo = ch2
             };
 
-            db.ChapterBindings.Add(cb);
+            tb.Chapters.Add(cb);
             db.SaveChanges();
 
             return Json("Success!", JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
-        public ActionResult AlignSentences(int id1, int id2)
+        public ActionResult CreateTwinBook(int id)
         {
-            var book1 = db.Books.Find(id1);
-            var book2 = db.Books.Find(id2);
+            var tb = db.TwinBooks.Find(id);
 
-            var chapters = db.getChapterBindings(book1, book2);
-            //var chapters1 = db.getBindedChapters(book1, book2);
-            //var chapters2 = db.getBindedChapters(book2, book1);
+            var twinPath = BookFormatter.CreateTweenBook(tb);
 
-            var twin = BookFormatter.CreateTweenBook(book1, book2, chapters);
+            tb.Path = twinPath;
 
-            var bms = BookAligner.AlignByChapters(book1, book2, twin);
+            var bms = BookAligner.AlignByChapters(tb);
 
-            foreach (var bm in bms)
-            {
-                db.BookmarkBindings.Add(bm);
-            }
+            tb.Bookmarks = bms;
 
             db.SaveChanges();
 
-            var html = BookFormatter.GetHtmlBody(twin);
+            return RedirectToAction("GetTwinBook", new {id = tb.Id});
+        }
 
+        [HttpGet]
+        public ActionResult GetTwinBook(int id)
+        {
+            TwinBook tb = db.TwinBooks.Find(id);
 
-            return View(new Object[] { html });
+            db.reactivate(tb);
+
+            db.SaveChanges();
+
+            var marks = tb.Bookmarks.Where(b => b.Active == true).OrderBy(r => r.Bookmark1.Order).Select(
+                b => new
+                {
+                    Id = b.Id,
+                    BookId1 = b.Bookmark1.InBook.Id,
+                    BookId2 = b.Bookmark2.InBook.Id,
+                    BookmarkId1 = b.Bookmark1.BookmarkId,
+                    BookmarkId2 = b.Bookmark2.BookmarkId,
+                    Order1 = b.Bookmark1.Order,
+                    Order2 = b.Bookmark2.Order,
+                    Type = b.Type
+                }
+            );
+
+            var oSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            string sJSON = oSerializer.Serialize(marks);
+
+            ViewBag.Alignments = sJSON;
+
+            return View(tb);
         }
 
         //
         // GET: Alignment/CreateBookmark/{id1}/{id2}
 
         [HttpGet]
-        public JsonResult CreateBookmarkBinding(int book1, int book2, string id1, string id2 = null)
+        public JsonResult CreateBookmarkBinding(int twinId, string id1, string id2 = null)
         {
-            Bookmark bm1 = db.Bookmarks.Single(r => (r.InBook.Id == book1) && (r.BookmarkId == id1));
-            Bookmark bm2 = db.Bookmarks.Single(r => (r.InBook.Id == book2) && (r.BookmarkId == id2));
+
+            var tb = db.TwinBooks.Find(twinId);
+
+            Bookmark bm1 = db.Bookmarks.Single(r => (r.InBook.Id == tb.Book1.Id) && (r.BookmarkId == id1));
+            Bookmark bm2 = db.Bookmarks.Single(r => (r.InBook.Id == tb.Book2.Id) && (r.BookmarkId == id2));
+
+            // creating new bookmark
+
             BookmarkBinding mark = new BookmarkBinding()
             {
                 Bookmark1 = bm1,
                 Bookmark2 = bm2,
-                Type = 1
+                Type = 1,
+                Active = true
             };
 
-            var marks = db.getBookmarks(book1, book2);
+            // get active bookmarks
 
-            var upper = marks.LastOrDefault(b => b.Bookmark1.Order < mark.Bookmark1.Order && b.Type == 1);
-            if (upper == null) upper = marks.First();
-            var lower = marks.FirstOrDefault(b => b.Bookmark1.Order > mark.Bookmark1.Order && b.Type == 1);
-            if (lower == null) lower = marks.Last();
-            var realign = BookAligner.AlignInRange(upper, mark);
-            realign.AddRange(BookAligner.AlignInRange(mark, lower));
-            db.BookmarkBindings.Add(mark);
-            
-            foreach (var b in realign) {
-                db.BookmarkBindings.Add(b);
+            var active = tb.Bookmarks.Where(b => b.Active == true && b.Type == 1).OrderBy(r => r.Bookmark1.Order);
+
+            // get touched region
+
+            var affected = active.Where(r => ((r.Bookmark1.Order - mark.Bookmark1.Order) * (r.Bookmark2.Order - mark.Bookmark2.Order) <= 0)
+                    && (r.CreatedAt < mark.CreatedAt));
+
+            //set inactive or delete
+
+            foreach (var b in affected)
+            {
+                b.Active = false;
             }
-             
+
+            var upper = active.LastOrDefault(b => b.Bookmark1.Order < mark.Bookmark1.Order && b.Active == true && b.Type == 1);
+            if (upper == null) upper = tb.Bookmarks.OrderBy(r => r.Bookmark1.Order).First();
+            var lower = active.FirstOrDefault(b => b.Bookmark1.Order > mark.Bookmark1.Order && b.Active == true && b.Type == 1);
+            if (lower == null) lower = tb.Bookmarks.OrderBy(r => r.Bookmark1.Order).Last();
+
+            var realign = BookAligner.AlignInRange(upper, mark);
+            realign.Add(mark);
+            realign.AddRange(BookAligner.AlignInRange(mark, lower));
+
+            var toDelete = tb.Bookmarks.Where(r => (r.Bookmark1.Order >= upper.Bookmark1.Order
+                && r.Bookmark1.Order <= lower.Bookmark1.Order) && (r.Type == 0)).ToList();
+
+            var inactive = tb.Bookmarks.Where(r => (r.Active == false) && (r.Type == 0)).ToList();
+            toDelete.AddRange(inactive);
+
+            foreach (var b in toDelete)
+            {
+                tb.Bookmarks.Remove(b);
+            }
+
+            foreach (var b in realign) {
+                tb.Bookmarks.Add(b);
+            }
+            
+
             db.SaveChanges();
 
-            return Json("Success!", JsonRequestBehavior.AllowGet);
-        }
+            // get realigned fragment
 
-        [HttpGet]
-        public JsonResult GetBookmarkBinding(int book1, int book2)
-        {
-
-            var marks = db.getBookmarks(book1, book2).Select(
+            var marks = tb.Bookmarks.Where(b => b.Active == true).OrderBy(b => b.Bookmark1.Order).Select(
                     b => new
                     {
                         Id = b.Id,
@@ -116,6 +191,8 @@ namespace EasyReading.Controllers
                         BookId2 = b.Bookmark2.InBook.Id,
                         BookmarkId1 = b.Bookmark1.BookmarkId,
                         BookmarkId2 = b.Bookmark2.BookmarkId,
+                        Order1 = b.Bookmark1.Order,
+                        Order2 = b.Bookmark2.Order,
                         Type = b.Type
                     }
                 );
@@ -124,23 +201,5 @@ namespace EasyReading.Controllers
             return Json(marks, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpGet]
-        public JsonResult GetRawBookmarkBinding(int book1, int book2)
-        {
-
-            var marks = db.getBookmarkBindings(book1, book2).Select(
-                    b => new
-                    {
-                        Id = b.Id,
-                        BookId1 = b.Bookmark1.InBook.Id,
-                        BookId2 = b.Bookmark2.InBook.Id,
-                        BookmarkId1 = b.Bookmark1.BookmarkId,
-                        BookmarkId2 = b.Bookmark2.BookmarkId
-                    }
-                );
-
-
-            return Json(marks, JsonRequestBehavior.AllowGet);
-        }
     }
 }
