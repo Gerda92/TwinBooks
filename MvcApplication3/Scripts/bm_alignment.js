@@ -5,6 +5,7 @@ var href = window.location.pathname;
 var twin = (/\/([0-9]+)/g).exec(href)[1];
 var bindings = null;
 
+// colors
 var highlight = "rgb(160, 222, 238)";
 var hover_color = "rgb(209, 237, 245)";
 
@@ -17,17 +18,17 @@ $(document).ready(function () {
 });
 
 function addBookmarkBinding(id1, id2) {
-    //alert(id1 + " " + id2);
     $.ajax({
         url: "http://localhost:1600/Alignment/CreateBookmark/" + twin + "/" + id1 + "/" + id2,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         cache: false,
         success: function (data) {
-            //alert("Ura! " + data.length);
             bindings = data;
             draw_table(bindings);
             rebind();
+
+            // mark hightlight
             var mark = $.grep(bindings, function (el, i) { return el.BookmarkId1 == id1 })[0];
 
             $("#mark-" + mark.Id + " td").css("background-color", "rgb(240, 105, 115)");
