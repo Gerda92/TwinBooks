@@ -201,5 +201,35 @@ namespace EasyReading.Controllers
             return Json(marks, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult GetBookmarkBinding(int twinId)
+        {
+
+            var tb = db.TwinBooks.Find(twinId);
+
+            //db.reactivate(tb);
+
+            //db.SaveChanges();
+
+            // get realigned fragment
+
+            var marks = tb.Bookmarks.Where(b => b.Active == true).OrderBy(b => b.Bookmark1.Order).Select(
+                    b => new
+                    {
+                        Id = b.Id,
+                        BookId1 = b.Bookmark1.InBook.Id,
+                        BookId2 = b.Bookmark2.InBook.Id,
+                        BookmarkId1 = b.Bookmark1.BookmarkId,
+                        BookmarkId2 = b.Bookmark2.BookmarkId,
+                        Order1 = b.Bookmark1.Order,
+                        Order2 = b.Bookmark2.Order,
+                        Type = b.Type
+                    }
+                );
+
+
+            return Json(marks, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

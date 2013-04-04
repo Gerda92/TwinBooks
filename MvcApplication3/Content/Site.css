@@ -774,7 +774,7 @@ tr.pager td {
 }
 
 .mark-info {
-    visibility:hidden;
+    visibility: hidden;
     width:5%;
     color:white;
     border: 5px solid #efeeef;
@@ -783,19 +783,20 @@ tr.pager td {
 
 .user-made {
     background-color: rgb(73, 202, 73);
+    content: 'User';
 }
+
 .aligner-made {
     background-color: rgb(240, 105, 115);
+    content: 'Auto';
 }
 
 .sentence:hover {
     cursor:pointer;
+    background-color: rgb(209, 237, 245);
 }
 
-#mark-new td {
-    background-color: rgb(240, 105, 115);
-}
-
-.after-new td {
-    background-color: grey;
+.loading {
+    background: transparent url('http://metroui.org.ua/images/preloader-w8-cycle-black.gif') no-repeat 5px center;
+    background-size: 35px;
 }

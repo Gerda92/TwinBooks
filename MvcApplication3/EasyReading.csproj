@@ -319,7 +319,6 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\Alignment\AlignChapters.cshtml" />
     <Content Include="Views\Alignment\GetTwinBook.cshtml" />
-    <Content Include="Views\Alignment\Binding.cshtml" />
     <Content Include="Views\Book\Create.cshtml">
       <SubType>Code</SubType>
     </Content>

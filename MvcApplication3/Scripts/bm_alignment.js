@@ -27,20 +27,23 @@ function addBookmarkBinding(id1, id2) {
             bindings = data;
             draw_table(bindings);
             rebind();
-
-            // mark hightlight
-            var mark = $.grep(bindings, function (el, i) { return el.BookmarkId1 == id1 })[0];
-
-            $("#mark-" + mark.Id + " td").css("background-color", "rgb(240, 105, 115)");
-            $("#mark-" + mark.Id + " td").animate({ backgroundColor: '#FFFFFF' }, 1200);
+            newMarkHighlight(id1);
         },
         error: function () {
             alert('Some kind of error');
         },
         complete: function () {
-            $('.sentence').attr('style', 'background: inherit;');
         }
     });
+}
+
+function newMarkHighlight(id1) {
+    // mark hightlight
+    var mark = $.grep(bindings, function (el, i) { return el.BookmarkId1 == id1 })[0];
+
+    $("#mark-" + mark.Id + " .twins")
+        .css("background-color", "rgb(73, 202, 73)")
+        .animate({ backgroundColor: '#FFFFFF' }, 1200);
 }
 
 function contradicts(mark1, mark2) {
@@ -96,48 +99,40 @@ function rebind() {
                 var c = id2; id2 = id1; id1 = c;
                 c = mark_id2; mark_id2 = mark_id1; mark_id1 = c;
             }
-            //alert(mark_id1 + " " + mark_id2);
-            
-            //previewRealign(id1, id2, mark_id1, mark_id2);
 
-            addBookmarkBinding(id1, id2);
+            // if same language
+            if ($("#" + id1).parents('.left-twin').length == 0 ||
+                $("#" + id2).parents('.right-twin').length == 0) {
+                $(".sentence").css('background', '');
+                $(this).css('background', highlight);
+                id1 = id2;
+                return;
+            } else {
+                previewRealign(id1, id2, mark_id1, mark_id2);
+                addBookmarkBinding(id1, id2);
+            }
+
             id1 = null
             selected = null;
         }
     });
 
-    $('.sentence').hover(function () {
-        $(this).attr('style', 'background: ' + hover_color + ';');
-
-        /*
-        var id = (/sent-(.+)/g).exec(this.id)[1];
-        var sentences = $.grep(bindings, function (el, i) { return el.BookmarkId1 == id });
-        if (sentences) {
-            for (var i = 0; i < sentences.length; i++) {
-                //alert(sentences[i].BookmarkId2)
-                $('#' + sentences[i].BookmarkId2).attr('style', 'background: #ffb7b7;');
-            }
-        }
-        */
-    }, function () {
-        if (id1 == null || (id1 != null && (/sent-(.+)/g).exec(this.id)[1] != id1))
-            $(this).attr('style', 'background: inherit;');
-    });
-
     $(document).mousedown(function (e) {
         if (e.which == 3) {
             id1 = null;
-            $('.sentence').attr('style', 'background: inherit;');
+            $('.sentence').css('background', '');
         }
     });
+
 }
 
 function stringTableRaw(mark, left, right) {
     return '<tr id="mark-' + mark.Id + '" class="mark">' +
-        '<td class="left-twin">' + left + "</td>" +
-        '<td class="right-twin">' + right + "</td>" +
+        '<td class="twins left-twin">' + left + "</td>" +
+        '<td class="twins right-twin">' + right + "</td>" +
         '<td class="mark-info ' + (mark.Type == 1 ? "user" : "aligner") + '-made">' +
-        (mark.Type == 1 ? "User" : "Aligner") + "</td>" +
+        //(mark.Type == 1 ? "User" : "Aligner") +
+        "</td>" +
     '</tr>';
 }
 
@@ -147,46 +142,15 @@ function previewRealign(id1, id2, mark_id1, mark_id2) {
     var rr = 0;
     while (bindings[rr].Id != mark_id2) rr++;
 
-    var j = (ll < rr ? ll : rr) + 1;
-    var min_j = j - 2;
-    var max_j = (ll > rr ? ll : rr) + 1;
+    var j = (ll < rr ? ll : rr);
+    var min_j = j;
+    var max_j = (ll > rr ? ll : rr);
 
-    var mark = { Id: 'new', Type: 1 };
-    $("#mark-" + bindings[min_j].Id)
-        .after(stringTableRaw(mark, $("#sent-" + id1).html(), $("#sent-" + id2).html()));
+    while (j <= max_j) {
+        $("#mark-" + bindings[j].Id + " .mark-info")
+            .attr("class", "mark-info loading").css("visibility", "visible");
 
-    var mark2 = { Id: 'after', Type: 0 };
-    $("#mark-" + bindings[max_j].Id)
-        .after(stringTableRaw(mark2, '', ''));
-
-    $("#mark-" + bindings[max_j - 1].Id).remove();
-    $("#mark-" + bindings[max_j].Id).remove();
-
-    while (j < max_j - 1) {
-        if (ll < rr) {
-            $("#mark-" + bindings[min_j].Id + " .right-twin")
-                .append($("#mark-" + bindings[j].Id + " .right-twin").html());
-            $("#mark-after .left-twin")
-                .append($("#mark-" + bindings[j].Id + " .left-twin").html());
-        }
-        if (ll > rr) {
-            $("#mark-" + bindings[min_j].Id + " .left-twin")
-                .append($("#mark-" + bindings[j].Id + " .left-twin").html());
-            $("#mark-after .right-twin")
-                .append($("#mark-" + bindings[j].Id + " .right-twin").html());
-        }
-        $("#mark-" + bindings[j].Id).remove();
         j++;
     }
-
-
-    var toUp = $("#mark-" + bindings[min_j + 1].Id + " #sent-" + bindings[min_j + 1].BookmarkId1)
-        .nextUntil("#sent-" + id1).andSelf();
-
-    $("#mark-" + bindings[min_j].Id + " .right-twin")
-                .append($(toUp).html());
-
-
-    $("#mark-" + bindings[min_j + 1].Id).remove();
 
 }
