@@ -182,7 +182,6 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AlignmentController.cs" />
     <Compile Include="Controllers\BookController.cs" />
-    <Compile Include="Controllers\ChapterController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
@@ -193,7 +192,6 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Book.cs" />
     <Compile Include="Models\BookDbContext.cs" />
-    <Compile Include="Models\BookGroup.cs" />
     <Compile Include="Models\Bookmark.cs" />
     <Compile Include="Models\BookmarkBinding.cs" />
     <Compile Include="Models\Chapter.cs" />
@@ -270,6 +268,7 @@
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-ui-1.8.20.js" />
     <Content Include="Scripts\jquery-ui-1.8.20.min.js" />
+    <Content Include="Scripts\jquery.animate-colors-min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -313,26 +312,17 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Book\Index.cshtml" />
-    <Content Include="Views\Book\Details.cshtml" />
-    <Content Include="Views\Book\Create.cshtml" />
-    <Content Include="Views\Book\Edit.cshtml" />
-    <Content Include="Views\Book\Delete.cshtml" />
     <Content Include="Views\Alignment\AlignChapters.cshtml" />
-    <Content Include="Views\Chapter\Index.cshtml" />
-    <Content Include="Views\Chapter\Details.cshtml" />
-    <Content Include="Views\Chapter\Create.cshtml" />
-    <Content Include="Views\Chapter\Edit.cshtml" />
-    <Content Include="Views\Chapter\Delete.cshtml" />
     <Content Include="Views\Alignment\GetTwinBook.cshtml" />
     <Content Include="Views\Alignment\Binding.cshtml" />
+    <Content Include="Views\Book\Create.cshtml">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\HtmlBooks\" />

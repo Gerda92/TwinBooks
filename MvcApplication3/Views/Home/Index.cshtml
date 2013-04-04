@@ -5,7 +5,7 @@
 <ul>
     @foreach (var item in Model)
     {
-        <li>@Html.ActionLink(item.Title, "AlignChapters", "Alignment", new { id1 = item.Books.ElementAt(0).Id, id2 = item.Books.ElementAt(1).Id }, new { })
-            by @item.Author</li>
+        <li>@Html.ActionLink(item.Book1.Title, "GetTwinBook", "Alignment", new { id = item.Id }, new { })
+            by @item.Book1.Author</li>
     }
 </ul>

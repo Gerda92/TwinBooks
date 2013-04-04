@@ -762,7 +762,40 @@ tr.pager td {
 }
 
 .left-twin, .right-twin {
-    float:left;
     width:45%;
-    padding: 20px;
+    padding: 10px;
+    background-color: white;
+    margin: 10px;
+    border: 5px solid #efeeef;
+}
+
+.mark:hover .mark-info {
+    visibility:visible;
+}
+
+.mark-info {
+    visibility:hidden;
+    width:5%;
+    color:white;
+    border: 5px solid #efeeef;
+    text-align:center;
+}
+
+.user-made {
+    background-color: rgb(73, 202, 73);
+}
+.aligner-made {
+    background-color: rgb(240, 105, 115);
+}
+
+.sentence:hover {
+    cursor:pointer;
+}
+
+#mark-new td {
+    background-color: rgb(240, 105, 115);
+}
+
+.after-new td {
+    background-color: grey;
 }

@@ -11,7 +11,6 @@ namespace EasyReading.Models
     {
         public DbSet<Book> Books { get; set; }
         public DbSet<TwinBook> TwinBooks { get; set; }
-        public DbSet<BookGroup> BookGroups { get; set; }
         public DbSet<Chapter> Chapters { get; set; }
         public DbSet<ChapterBinding> ChapterBindings { get; set; }
         public DbSet<BookmarkBinding> BookmarkBindings { get; set; }

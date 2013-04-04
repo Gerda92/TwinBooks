@@ -25,9 +25,6 @@ namespace EasyReading.Models
         public virtual ICollection<Chapter> Chapters { get; set; }
         public virtual ICollection<Bookmark> Bookmarks { get; set; }
 
-        // The same book in different languages or variants is one group
-        public BookGroup Group { get; set; }
-
         public Book()
         {
             Chapters = new List<Chapter>();

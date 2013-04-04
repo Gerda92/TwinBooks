@@ -90,9 +90,9 @@ namespace EasyReading.Controllers
         {
             TwinBook tb = db.TwinBooks.Find(id);
 
-            db.reactivate(tb);
+            //db.reactivate(tb);
 
-            db.SaveChanges();
+            //db.SaveChanges();
 
             var marks = tb.Bookmarks.Where(b => b.Active == true).OrderBy(r => r.Bookmark1.Order).Select(
                 b => new
